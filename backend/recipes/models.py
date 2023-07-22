@@ -117,7 +117,38 @@ class Recipe(models.Model):
     class Meta:
         verbose_name = 'Рецепт',
         verbose_name_plural = 'Рецепты',
-        ordering = ('-pub_date',)
+        ordering = ('-created',)
 
     def __str__(self):
         return f'Блюдо: {self.name}'
+
+
+class IngredientAmount(models.Model):
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+        related_name='recipe',
+    )
+    ingredient = models.ForeignKey(
+        Ingredient,
+        on_delete=models.CASCADE,
+        related_name='ingredient',
+    )
+    amount = models.PositiveIntegerField(
+        'Количество',
+        default=1,
+        validators=(MinValueValidator(1,'Минимально 1'),)
+    )
+
+    class Meta:
+        ordering = ('id',)
+        verbose_name = 'Количество ингредиента'
+        verbose_name_plural = 'Количество ингредиентов'
+        constraints = [
+            models.UniqueConstraint(
+                fields=('recipe', 'ingredient'),
+                name='unique ingredient')]
+
+    def __str__(self):
+        return (f'В рецепте {self.recipe.name} {self.amount} '
+                f'{self.ingredient.measurement} {self.ingredient.name}')
