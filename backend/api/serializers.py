@@ -6,13 +6,8 @@ from django.core.files.base import ContentFile
 from django.contrib.auth.hashers import check_password
 from rest_framework import serializers
 
-<<<<<<< HEAD
 from recipes.models import Ingredient, IngredientAmount, \
     Recipe, Tag, FavoriteRecipe
-=======
-from recipes.models import Ingredient, IngredientAmount, Recipe, Tag, FavoriteRecipe
-
->>>>>>> 7b1235aef07c0b9a2028cbc2caec035f0dca6e7e
 from users.models import User, Subscribe
 
 
