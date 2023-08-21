@@ -4,6 +4,7 @@ from .models import User, Subscribe
 
 EMPTY_VALUE = '-пусто-'
 
+
 class UserAdmin(admin.ModelAdmin):
     list_display = (
         'id', 'username', 'first_name', 'last_name', 'email', 'password'

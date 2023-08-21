@@ -1,4 +1,3 @@
-from django.contrib.auth import get_user_model
 from django.db.models import Sum
 from django.shortcuts import get_object_or_404
 from djoser.views import UserViewSet
@@ -9,21 +8,17 @@ from rest_framework.permissions import (SAFE_METHODS, IsAuthenticated,
                                         IsAuthenticatedOrReadOnly)
 
 from rest_framework.response import Response
-from rest_framework.status import HTTP_400_BAD_REQUEST, HTTP_201_CREATED, HTTP_204_NO_CONTENT
-from rest_framework.viewsets import ModelViewSet, ViewSet
+from rest_framework.viewsets import ModelViewSet
 
 from .permissions import IsAuthorOrReadOnly
-from recipes.models import FavoriteRecipe, Ingredient, Recipe, ShoppingCart, Tag
+from recipes.models import FavoriteRecipe, Ingredient, \
+    Recipe, ShoppingCart, Tag
 from users.models import User, Subscribe
-from .filters import IngredientFilter, RecipeFilter
-from .paginator import PageNumberPagination
+from .filters import RecipeFilter
 from .serializers import (IngredientSerializer, RecipeEditSerializer,
-                          RecipesSerializer, SubscribeRecipeSerializer,
-                          TagSerializer, UserSubscribeSerializer,
-                          UserCreateSerializer, UserListSerializer,
-                          SetPasswordSerializer, FavoriteSerializer)
-
-User = get_user_model()
+                          RecipesSerializer, TagSerializer,
+                          UserSubscribeSerializer, UserListSerializer,
+                          FavoriteSerializer)
 
 
 class TagViewSet(ModelViewSet):
@@ -32,9 +27,8 @@ class TagViewSet(ModelViewSet):
     permission_classes = (IsAuthenticatedOrReadOnly,)
     pagination_class = None
 
-class RecipeViewSet(ModelViewSet):
-    """Вьюсет для работы с обьектами класса Recipe."""
 
+class RecipeViewSet(ModelViewSet):
     queryset = Recipe.objects.all()
     permission_classes = (IsAuthorOrReadOnly,)
     filterset_class = RecipeFilter
@@ -174,4 +168,3 @@ class CustomUserViewSet(UserViewSet):
                             status=status.HTTP_204_NO_CONTENT)
         return Response(f'Вы не подписаны на {author}',
                         status=status.HTTP_400_BAD_REQUEST)
-    

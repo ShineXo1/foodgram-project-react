@@ -1,11 +1,13 @@
 import base64
 
-from djoser.serializers import PasswordSerializer, UserCreateSerializer, UserSerializer
+from djoser.serializers import PasswordSerializer, \
+    UserCreateSerializer, UserSerializer
 from django.core.files.base import ContentFile
 from django.contrib.auth.hashers import check_password
 from rest_framework import serializers
 
-from recipes.models import Ingredient, IngredientAmount, Recipe, Tag, FavoriteRecipe
+from recipes.models import Ingredient, IngredientAmount, \
+    Recipe, Tag, FavoriteRecipe
 from users.models import User, Subscribe
 
 
@@ -78,7 +80,8 @@ class RecipesSerializer(serializers.ModelSerializer):
     ingredients = IngredientAmountSerializer(many=True)
     author = UserListSerializer(required=True)
     is_in_favorite = serializers.SerializerMethodField('get_is_in_favorite')
-    is_in_shopping_cart = serializers.SerializerMethodField('get_is_in_shopping_cart')
+    is_in_shopping_cart = serializers.SerializerMethodField(
+        'get_is_in_shopping_cart')
 
     class Meta:
         model = Recipe
