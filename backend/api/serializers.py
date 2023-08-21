@@ -5,7 +5,8 @@ from django.core.files.base import ContentFile
 from django.contrib.auth.hashers import check_password
 from rest_framework import serializers
 
-from recipes.models import Ingredient, IngredientAmount, Recipe, Tag
+from recipes.models import Ingredient, IngredientAmount, Recipe, Tag, FavoriteRecipe
+
 from users.models import User, Subscribe
 
 
@@ -108,7 +109,8 @@ class SubscribeRecipeSerializer(RecipesSerializer):
 
 class RecipeEditSerializer(RecipesSerializer):
     ingredients = IngredientPatchCreateSerializer(many=True)
-    tags = serializers.ListField(many=True)
+    tags = serializers.ListField(write_only=True)
+
 
     class Meta:
         model = Recipe
@@ -169,6 +171,20 @@ class RecipeEditSerializer(RecipesSerializer):
             instance, validated_data)
 
 
+
+class FavoriteSerializer(SubscribeRecipeSerializer):
+    class Meta:
+        model = FavoriteRecipe
+        fields = ('user', 'recipe')
+
+    def to_representation(self, instance):
+        return representation(
+            self.context,
+            instance.recipe,
+            SubscribeRecipeSerializer)
+
+
+
 class SetPasswordSerializer(PasswordSerializer):
     current_password = serializers.CharField(
         required=True,
@@ -207,3 +223,11 @@ class UserSubscribeSerializer(UserListSerializer):
                 queryset = queryset[:int(recipes_limit)]
         serializer = SubscribeRecipeSerializer(queryset, many=True)
         return serializer.data
+
+
+def representation(context, instance, serializer):
+    """Функция для использования в to_representation"""
+
+    request = context.get('request')
+    new_context = {'request': request}
+    return serializer(instance, context=new_context).data
