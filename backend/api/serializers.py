@@ -6,8 +6,13 @@ from django.core.files.base import ContentFile
 from django.contrib.auth.hashers import check_password
 from rest_framework import serializers
 
+<<<<<<< HEAD
 from recipes.models import Ingredient, IngredientAmount, \
     Recipe, Tag, FavoriteRecipe
+=======
+from recipes.models import Ingredient, IngredientAmount, Recipe, Tag, FavoriteRecipe
+
+>>>>>>> 7b1235aef07c0b9a2028cbc2caec035f0dca6e7e
 from users.models import User, Subscribe
 
 
@@ -113,6 +118,7 @@ class RecipeEditSerializer(RecipesSerializer):
     ingredients = IngredientPatchCreateSerializer(many=True)
     tags = serializers.ListField(write_only=True)
 
+
     class Meta:
         model = Recipe
         fields = ('ingredients', 'tags', 'image',
@@ -172,6 +178,7 @@ class RecipeEditSerializer(RecipesSerializer):
             instance, validated_data)
 
 
+
 class FavoriteSerializer(SubscribeRecipeSerializer):
     class Meta:
         model = FavoriteRecipe
@@ -182,6 +189,7 @@ class FavoriteSerializer(SubscribeRecipeSerializer):
             self.context,
             instance.recipe,
             SubscribeRecipeSerializer)
+
 
 
 class SetPasswordSerializer(PasswordSerializer):
