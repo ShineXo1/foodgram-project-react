@@ -168,8 +168,3 @@ class CustomUserViewSet(UserViewSet):
                             status=status.HTTP_204_NO_CONTENT)
         return Response(f'Вы не подписаны на {author}',
                         status=status.HTTP_400_BAD_REQUEST)
-<<<<<<< HEAD
-=======
-    
-
->>>>>>> 7b1235aef07c0b9a2028cbc2caec035f0dca6e7e
