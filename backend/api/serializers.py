@@ -113,7 +113,6 @@ class RecipeEditSerializer(RecipesSerializer):
     ingredients = IngredientPatchCreateSerializer(many=True)
     tags = serializers.ListField(write_only=True)
 
-
     class Meta:
         model = Recipe
         fields = ('ingredients', 'tags', 'image',
@@ -173,7 +172,6 @@ class RecipeEditSerializer(RecipesSerializer):
             instance, validated_data)
 
 
-
 class FavoriteSerializer(SubscribeRecipeSerializer):
     class Meta:
         model = FavoriteRecipe
@@ -184,7 +182,6 @@ class FavoriteSerializer(SubscribeRecipeSerializer):
             self.context,
             instance.recipe,
             SubscribeRecipeSerializer)
-
 
 
 class SetPasswordSerializer(PasswordSerializer):
