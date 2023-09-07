@@ -100,10 +100,11 @@ class RecipeViewSet(ModelViewSet):
         cart = user.shopping_cart.select_related('recipe').values(
             ingredient_name, ingredient_measure).annotate(Sum(
                 recipe_amount)).order_by(ingredient_name)
-        for i in cart:
+        for ingredients in cart:
             text += (
-                f'{i[ingredient_name]} ({i[ingredient_measure]})'
-                f' - {i[amount_sum]}\n'
+                f'{ingredients[ingredient_name]}'
+                f' ({ingredients[ingredient_measure]})'
+                f' - {ingredients[amount_sum]}\n'
             )
         response = HttpResponse(text, content_type='text/plain')
         filename = 'shopping_list.txt'
@@ -168,8 +169,3 @@ class CustomUserViewSet(UserViewSet):
                             status=status.HTTP_204_NO_CONTENT)
         return Response(f'Вы не подписаны на {author}',
                         status=status.HTTP_400_BAD_REQUEST)
-<<<<<<< HEAD
-=======
-    
-
->>>>>>> 7b1235aef07c0b9a2028cbc2caec035f0dca6e7e

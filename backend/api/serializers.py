@@ -1,18 +1,15 @@
 import base64
 
+from django.db import transaction
 from djoser.serializers import PasswordSerializer, \
     UserCreateSerializer, UserSerializer
 from django.core.files.base import ContentFile
 from django.contrib.auth.hashers import check_password
 from rest_framework import serializers
 
-<<<<<<< HEAD
+
 from recipes.models import Ingredient, IngredientAmount, \
     Recipe, Tag, FavoriteRecipe
-=======
-from recipes.models import Ingredient, IngredientAmount, Recipe, Tag, FavoriteRecipe
-
->>>>>>> 7b1235aef07c0b9a2028cbc2caec035f0dca6e7e
 from users.models import User, Subscribe
 
 
@@ -118,7 +115,6 @@ class RecipeEditSerializer(RecipesSerializer):
     ingredients = IngredientPatchCreateSerializer(many=True)
     tags = serializers.ListField(write_only=True)
 
-
     class Meta:
         model = Recipe
         fields = ('ingredients', 'tags', 'image',
@@ -129,35 +125,32 @@ class RecipeEditSerializer(RecipesSerializer):
         tags = data.get('tags')
         if not tags:
             raise serializers.ValidationError('Добавьте тег')
-        array = []
+        ingredients_list = []
         for ingredient in ingredients:
             if ingredient.get('amount') <= 0:
                 raise serializers.ValidationError(
                     'Количество ингредиентов должно быть больше 0')
-            array.append(ingredient.get('id'))
-            if len(array) != len(set(array)):
+            ingredients_list.append(ingredient.get('id'))
+            if len(ingredients_list) != len(set(ingredients_list)):
                 raise serializers.ValidationError(
                     'Ингредиенты повторяются')
-            if len(array) == 0:
+            if not ingredients_list:
                 raise serializers.ValidationError(
                     'Должен быть хотя бы один ингредиент')
             return data
-        cooking_time = data.get('cooking_time')
-        if cooking_time > 300 or cooking_time < 1:
-            raise serializers.ValidationError({
-                'cooking_time': 'Время приготовления блюда от 1 до 300 минут'
-            })
         return data
 
     def add_ingredient(self, ingredients, recipe):
-        for ingredient in ingredients:
-            IngredientAmount.objects.bulk_create([
-                IngredientAmount(
-                    recipe=recipe,
-                    ingredient_id=ingredient.get('id'),
-                    amount=ingredient.get('amount'),)
-            ])
+        amounts = [
+            IngredientAmount(
+                recipe=recipe,
+                ingredient_id=ingredient.get('id'),
+                amount=ingredient.get('amount')
+            ) for ingredient in ingredients
+        ]
+        IngredientAmount.objects.bulk_create(amounts)
 
+    @transaction.atomic
     def create(self, validated_data):
         ingredients = validated_data.pop('ingredients')
         tags = validated_data.pop('tags')
@@ -166,6 +159,7 @@ class RecipeEditSerializer(RecipesSerializer):
         self.add_ingredient(ingredients, recipe)
         return recipe
 
+    @transaction.atomic
     def update(self, instance, validated_data):
         if 'ingredients' in validated_data:
             ingredients = validated_data.pop('ingredients')
@@ -178,7 +172,6 @@ class RecipeEditSerializer(RecipesSerializer):
             instance, validated_data)
 
 
-
 class FavoriteSerializer(SubscribeRecipeSerializer):
     class Meta:
         model = FavoriteRecipe
@@ -189,7 +182,6 @@ class FavoriteSerializer(SubscribeRecipeSerializer):
             self.context,
             instance.recipe,
             SubscribeRecipeSerializer)
-
 
 
 class SetPasswordSerializer(PasswordSerializer):
@@ -206,7 +198,7 @@ class SetPasswordSerializer(PasswordSerializer):
         if check_current is False:
             raise serializers.ValidationError({
                 "current_password": "Введен неверный пароль"})
-        return data
+        return super().validate(data)
 
 
 class UserSubscribeSerializer(UserListSerializer):
