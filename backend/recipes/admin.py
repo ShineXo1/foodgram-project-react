@@ -1,11 +1,12 @@
 from django.contrib import admin
+from import_export.admin import ImportExportMixin
 
 from .models import Ingredient, Tag, Recipe, \
     IngredientAmount, ShoppingCart, FavoriteRecipe
 
 
-class IngredientAdmin(admin.ModelAdmin):
-    list_display = ('name', 'measurement_point',)
+class IngredientAdmin(ImportExportMixin, admin.ModelAdmin):
+    list_display = ['name', 'measurement_point',]
     list_filter = ('name',)
     ordering = ('id',)
 

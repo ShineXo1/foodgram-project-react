@@ -1,5 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.utils.translation import gettext as _
+
 
 
 class User(AbstractUser):
@@ -35,23 +37,20 @@ class User(AbstractUser):
 
 class Subscribe(models.Model):
     user = models.ForeignKey(
-        User,
-        verbose_name='Подписчик',
+        User, on_delete=models.CASCADE,
         related_name='follower',
-        on_delete=models.CASCADE
-    )
+        verbose_name=_('Пользователь'))
     author = models.ForeignKey(
-        User,
-        verbose_name='Автор',
+        User, on_delete=models.CASCADE,
         related_name='following',
-        on_delete=models.CASCADE
-    )
+        verbose_name=_('Автор'))
 
-    class Meta:
-        verbose_name = 'Подписка'
-        verbose_name_plural = 'Подписки'
-        constraints = [
-            models.UniqueConstraint(
-                fields=('user', 'author'),
-                name='unique_subscription'),
-        ]
+    def __str__(self):
+        return f"{self.user} подписан на {self.author}"
+
+    class Meta():
+        ordering = ['-id']
+        verbose_name = _('Подписка')
+        verbose_name_plural = _('Подписки')
+        models.UniqueConstraint(
+            fields=['user', 'author'], name='unique_recording')

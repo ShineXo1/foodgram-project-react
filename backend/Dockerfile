@@ -1,7 +1,13 @@
 FROM python:3.9-slim
+
 WORKDIR /app
-COPY requirements.txt .
+
+COPY requirements.txt /app
+
 RUN python -m pip install --upgrade pip
-RUN pip install -r requirements.txt --no-cache-dir
+
+RUN pip3 install -r /app/requirements.txt --no-cache-dir
+
 COPY . .
-CMD ["python", "manage.py", "runserver", "0:8000"]
+
+CMD ["gunicorn", "foodgram.wsgi:application", "--bind", "0:8000"]

@@ -129,12 +129,12 @@ class IngredientAmount(models.Model):
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
-        related_name='recipe',
+        related_name='ingredients',
     )
     ingredient = models.ForeignKey(
         Ingredient,
         on_delete=models.CASCADE,
-        related_name='ingredient',
+        related_name='amounts',
     )
     amount = models.PositiveIntegerField(
         'Количество',
@@ -152,7 +152,7 @@ class IngredientAmount(models.Model):
         constraints = [
             models.UniqueConstraint(
                 fields=('recipe', 'ingredient'),
-                name='unique ingredient')]
+                name='unique_amount')]
 
     def __str__(self):
         return (f'В рецепте {self.recipe.name} {self.amount} '
