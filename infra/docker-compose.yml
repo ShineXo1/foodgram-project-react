@@ -21,6 +21,19 @@ services:
     # Какой volume подключить для этого контейнера
     volumes:
       - pg_data:/var/lib/postgresql/data
+
+  web:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    restart: always
+    volumes:
+      - static:/app/static/
+      - media:/app/media/
+    depends_on:
+      - db
+    env_file:
+      - ./.env
   # Имя и описание контейнера с бэкендом
   backend:
     # Из какого Dockerfile собирать образ для этого контейнера:

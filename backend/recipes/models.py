@@ -81,17 +81,17 @@ class Recipe(models.Model):
         User,
         on_delete=models.CASCADE,
         verbose_name='Автор рецепта',
-        related_name='recipie'
+        related_name='recipes'
     )
-    ingredients = models.ManyToManyField(
-        Ingredient,
-        verbose_name='Продукты',
-        through='IngredientAmount'
-    )
+    # ingredients = models.ManyToManyField(
+    #     Ingredient,
+    #     verbose_name='Продукты',
+    #     through='IngredientAmount'
+    # )
     tags = models.ManyToManyField(
         Tag,
         verbose_name='Тег',
-        related_name='recipies',
+        related_name='recipes',
     )
     image = models.ImageField(
         'Фото блюда',
@@ -151,7 +151,7 @@ class IngredientAmount(models.Model):
         verbose_name_plural = 'Количество ингредиентов'
         constraints = [
             models.UniqueConstraint(
-                fields=('recipe', 'ingredient'),
+                fields=['recipe', 'ingredient'],
                 name='unique_amount')]
 
     def __str__(self):
@@ -164,13 +164,13 @@ class ShoppingCart(models.Model):
         User,
         on_delete=models.CASCADE,
         verbose_name='Пользователь',
-        related_name='cart'
+        related_name='shopping_cart'
     )
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
         verbose_name='В корзине',
-        related_name='in_shopping_cart'
+        related_name='shopping_cart'
     )
 
     class Meta:
@@ -190,16 +190,20 @@ class ShoppingCart(models.Model):
 class FavoriteRecipe(models.Model):
     user = models.ForeignKey(
         User,
-        on_delete=models.CASCADE,
         verbose_name='Пользователь',
-        related_name='favorites'
+        on_delete=models.CASCADE,
+        related_name='favorite_recipe',
     )
     recipe = models.ForeignKey(
         Recipe,
+        verbose_name='Рецепт',
         on_delete=models.CASCADE,
-        verbose_name='В избранном',
-        related_name='favorite'
+        related_name='favorite_recipe'
     )
+    
+    class Meta:
+        verbose_name = 'Избранное'
+        verbose_name_plural = 'Избранные'
 
     class Meta:
         verbose_name = 'Избранное'

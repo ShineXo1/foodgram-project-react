@@ -79,27 +79,32 @@ class RecipesSerializer(serializers.ModelSerializer):
     tags = TagSerializer(many=True)
     ingredients = IngredientAmountSerializer(many=True)
     author = UserListSerializer(required=True)
-    is_in_favorite = serializers.SerializerMethodField('get_is_in_favorite')
-    is_in_shopping_cart = serializers.SerializerMethodField(
-        'get_is_in_shopping_cart')
+    is_in_favorite = serializers.SerializerMethodField()
+    is_in_shopping_cart = serializers.SerializerMethodField()
 
     class Meta:
         model = Recipe
-        fields = '__all__'
+        fields = ('id', 'tags', 'author', 'ingredients', 'is_in_favorite',
+                  'is_in_shopping_cart', 'name', 'image', 'text',
+                  'cooking_time')
 
     def get_is_in_favorite(self, obj):
-        request = self.context.get('request')
-        if request.user.is_authenticated:
-            favorites = request.user.favorites.filter(recipe=obj)
-            return favorites.exists()
-        return False
+        user = self.context['request'].user
+        if user.is_anonymous:
+            return False
+        return FavoriteRecipe.objects.filter(
+            user=user,
+            recipe=obj
+        ).exists()
 
     def get_is_in_shopping_cart(self, obj):
-        request = self.context.get('request')
-        if request.user.is_authenticated:
-            cart = request.user.favorites.filter(recipe=obj)
-            return cart.exists()
-        return False
+        user = self.context['request'].user
+        if user.is_anonymous:
+            return False
+        return Recipe.objects.filter(
+            shopping_cart__user=user,
+            id=obj.id
+        ).exists()
 
 
 class SubscribeRecipeSerializer(RecipesSerializer):
@@ -172,18 +177,6 @@ class RecipeEditSerializer(RecipesSerializer):
         return instance
 
 
-class FavoriteSerializer(SubscribeRecipeSerializer):
-    class Meta:
-        model = FavoriteRecipe
-        fields = ('user', 'recipe')
-
-    def to_representation(self, instance):
-        return representation(
-            self.context,
-            instance.recipe,
-            SubscribeRecipeSerializer)
-
-
 class SetPasswordSerializer(PasswordSerializer):
     current_password = serializers.CharField(
         required=True,
@@ -238,9 +231,3 @@ def representation(context, instance, serializer):
     request = context.get('request')
     new_context = {'request': request}
     return serializer(instance, context=new_context).data
-
-
-class ShoppingCartSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Recipe
-        fields = ('id', 'name', 'image', 'cooking_time', )

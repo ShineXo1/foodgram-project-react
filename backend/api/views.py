@@ -1,11 +1,12 @@
 import csv
 
 from django.db.models import Sum
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
 from django.utils.translation import gettext as _
 from rest_framework import status, permissions
-from django.http import HttpResponse
 from rest_framework.decorators import action
 from rest_framework.permissions import (SAFE_METHODS, IsAuthenticated,
                                         IsAuthenticatedOrReadOnly)
@@ -13,98 +14,60 @@ from rest_framework.permissions import (SAFE_METHODS, IsAuthenticated,
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
+from .paginator import FoodgramPafination
 from .permissions import IsAuthorOrReadOnly
 from recipes.models import FavoriteRecipe, Ingredient, \
     Recipe, ShoppingCart, Tag, IngredientAmount
 from users.models import User, Subscribe
-from .filters import RecipeFilter
+from .filters import RecipeFilter, IngredientFilter
 from .serializers import (IngredientSerializer, RecipeEditSerializer,
                           RecipesSerializer, TagSerializer,
-                          UserSubscribeSerializer, UserListSerializer,
-                          FavoriteSerializer, ShoppingCartSerializer)
+                          UserSubscribeSerializer, SubscribeRecipeSerializer)
+from .utils import add_remove
 
 
 class TagViewSet(ModelViewSet):
     serializer_class = TagSerializer
     queryset = Tag.objects.all()
-    permission_classes = (IsAuthenticatedOrReadOnly,)
+    permission_classes = (permissions.AllowAny,)
+    http_method_names = ('get',)
     pagination_class = None
 
 
 class RecipeViewSet(ModelViewSet):
     queryset = Recipe.objects.all()
-    permission_classes = (IsAuthorOrReadOnly,)
+    filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
+    http_method_names = ('get', 'post', 'patch', 'delete')
+    permission_classes = (IsAuthorOrReadOnly,)
+    pagination_class = FoodgramPafination
 
     def get_serializer_class(self):
         if self.request.method not in SAFE_METHODS:
             return RecipeEditSerializer
         return RecipesSerializer
 
-    @staticmethod
-    def create_object(request, pk, serializers):
-        data = {'user': request.user.id, 'recipe': pk}
-        serializer = serializers(data=data, context={'request': request})
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-    @staticmethod
-    def delete_object(request, pk, model):
-        user = request.user
-        recipe = get_object_or_404(Recipe, pk=pk)
-        object = get_object_or_404(model, user=user, recipe=recipe)
-        object.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-    def _create_or_destroy(self, http_method, recipe, key,
-                           model, serializer):
-        if http_method == 'POST':
-            return self.create_object(request=recipe, pk=key,
-                                      serializers=serializer)
-        return self.delete_object(request=recipe, pk=key, model=model)
+    @action(
+        methods=['POST', 'DELETE'],
+        detail=False,
+        url_path=r'(?P<recipe>\d+)/favorite',
+        url_name='recipe_favorite',
+        permission_classes=[IsAuthenticated]
+    )
+    def favorite(self, request, *args, **kwargs):
+        self.serializer_class = SubscribeRecipeSerializer
+        return add_remove(self, request, 'recipe', FavoriteRecipe, Recipe)
 
     @action(
-        detail=True,
-        methods=('post', 'delete'),
-        permission_classes=(IsAuthenticated,),
+        methods=['POST', 'DELETE'],
+        detail=False,
+        url_path=r'(?P<recipe>\d+)/shopping_cart',
+        url_name='recipe_cart',
+        permission_classes=[IsAuthenticated]
     )
-    def favorite(self, request, pk):
-        return self._create_or_destroy(
-            request.method, request, pk, FavoriteRecipe, FavoriteSerializer
-        )
-
-    @action(
-        detail=True,
-        methods=('get', 'delete'),
-        permission_classes=(IsAuthenticated,),
-    )
-    def shopping_cart(self, request, pk=None):
-        user = self.request.user
-        recipe = get_object_or_404(Recipe, pk=pk)
-        in_shopping_cart = ShoppingCart.objects.filter(
-            user=user,
-            recipe=recipe
-        )
-        if user.is_anonymous:
-            return Response(status=status.HTTP_401_UNAUTHORIZED)
-        if request.method == 'GET':
-            if not in_shopping_cart:
-                shopping_cart = ShoppingCart.objects.create(
-                    user=user,
-                    recipe=recipe
-                )
-                serializer = ShoppingCartSerializer(shopping_cart.recipe)
-                return Response(
-                    data=serializer.data,
-                    status=status.HTTP_201_CREATED
-                )
-        elif request.method == 'DELETE':
-            if not in_shopping_cart:
-                data = {'errors': 'Такой рецепта нет в списке покупок.'}
-                return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
-            in_shopping_cart.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
+    def cart(self, request, *args, **kwargs):
+        self.serializer_class = SubscribeRecipeSerializer
+        return add_remove(self, request, 'recipe', ShoppingCart, Recipe)
 
     @action(
         methods=['get'],
@@ -112,6 +75,7 @@ class RecipeViewSet(ModelViewSet):
         permission_classes=[IsAuthenticated, ],
     )
     def download_shopping_cart(self, request):
+        """Скачать список покупок."""
         user = self.request.user
         if user.is_anonymous:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
@@ -135,6 +99,7 @@ class RecipeViewSet(ModelViewSet):
 class IngredientViewSet(ModelViewSet):
     serializer_class = IngredientSerializer
     queryset = Ingredient.objects.all()
+    filterset_class = IngredientFilter
     permission_classes = (IsAuthenticatedOrReadOnly,)
     pagination_class = None
 
