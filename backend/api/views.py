@@ -12,8 +12,8 @@ from rest_framework.permissions import (SAFE_METHODS, IsAuthenticated,
                                         IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
-from recipes.models import FavoriteRecipe, Ingredient, \
-    Recipe, ShoppingCart, Tag, IngredientAmount
+from recipes.models import (FavoriteRecipe, Ingredient,
+    Recipe, ShoppingCart, Tag, IngredientAmount)
 from users.models import User, Subscribe
 from .filters import RecipeFilter, IngredientFilter
 from .paginator import FoodgramPafination
