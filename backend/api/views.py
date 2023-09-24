@@ -73,7 +73,6 @@ class RecipeViewSet(ModelViewSet):
         permission_classes=[IsAuthenticated, ],
     )
     def download_shopping_cart(self, request):
-        """Скачать список покупок."""
         user = self.request.user
         if user.is_anonymous:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
