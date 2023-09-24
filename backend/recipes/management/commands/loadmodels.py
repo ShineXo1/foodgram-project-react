@@ -1,28 +1,37 @@
-import csv
-from pathlib import Path
+import json
+import os
 
-from django.core.management.base import BaseCommand
+from django.conf import settings
+from django.core.management.base import BaseCommand, CommandError
+from django.db.utils import IntegrityError
+from django.utils.translation import gettext as _
 
-from foodgram.settings import BASE_DIR
 from recipes.models import Ingredient
 
-PROJECT_DIR = Path(BASE_DIR).resolve().parent.joinpath('data')
-FILE_TO_OPEN = PROJECT_DIR / "ingredients.csv"
+DATA_ROOT = os.path.join(settings.BASE_DIR, 'data')
 
 
 class Command(BaseCommand):
-    help = "Импорт ингредиентов в базу данных"
 
-    def handle(self, **kwargs):
-        with open(
-            FILE_TO_OPEN, "r", encoding="UTF-8"
-        ) as file:
-            reader = csv.reader(file, delimiter=",")
-            count = 0
-            for row in reader:
-                count += 1
-                Ingredient.objects.get_or_create(
-                    name=row[0],
-                    measurement_point=row[1]
-                )
-            print(f'Import {count} ingredients completed successfully')
+    def add_arguments(self, parser):
+        parser.add_argument('filename', default='ingredients.json', nargs='?',
+                            type=str)
+
+    def handle(self, *args, **options):
+        try:
+            with open(os.path.join(DATA_ROOT, options['filename']), 'r',
+                      encoding='utf-8') as f:
+                data = json.load(f)
+                for ingredient in data:
+                    try:
+                        Ingredient.objects.create(name=ingredient["name"],
+                                                  measurement_point=ingredient[
+                                                      "measurement_unit"])
+                    except IntegrityError:
+                        print(f'Ingredient {ingredient["name"]} '
+                              f'{ingredient["measurement_unit"]} '
+                              f'already added to the database')
+
+        except FileNotFoundError:
+            raise CommandError(_(f'The file is missing in the data folder{DATA_ROOT}'))
+            

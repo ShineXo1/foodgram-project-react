@@ -5,7 +5,7 @@ from .models import Ingredient, Tag, Recipe, \
 
 
 class IngredientAdmin(admin.ModelAdmin):
-    list_display = ('name', 'measurement_point',)
+    list_display = ['name', 'measurement_point',]
     list_filter = ('name',)
     ordering = ('id',)
 
@@ -23,7 +23,7 @@ class RecipeAdmin(admin.ModelAdmin):
     readonly_fields = ('favorite_count',)
 
     def favorite_count(self, obj):
-        return obj.favorite.count()
+        return obj.favorite_recipe.count()
 
     favorite_count.short_description = 'Izbrannoe'
 
