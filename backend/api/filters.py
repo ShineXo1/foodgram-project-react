@@ -1,14 +1,19 @@
+import django_filters
 from django.contrib.auth import get_user_model
 from django_filters import rest_framework as filters
-from rest_framework.filters import SearchFilter
 
 from recipes.models import Ingredient, Recipe, Tag
 
 User = get_user_model()
 
 
-class IngredientFilter(SearchFilter):
-    search_param = 'name'
+class IngredientFilter(django_filters.FilterSet):
+    name = django_filters.filters.CharFilter(
+        field_name='name', lookup_expr='icontains')
+
+    class Meta:
+        model = Ingredient
+        fields = ('name', )
 
 
 class RecipeFilter(filters.FilterSet):

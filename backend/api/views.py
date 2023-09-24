@@ -99,9 +99,11 @@ class RecipeViewSet(ModelViewSet):
 class IngredientViewSet(ModelViewSet):
     serializer_class = IngredientSerializer
     queryset = Ingredient.objects.all()
+    filter_backends = (DjangoFilterBackend,)
     filterset_class = IngredientFilter
     permission_classes = (IsAuthenticatedOrReadOnly,)
     pagination_class = None
+    http_method_names = ('get',)
 
 
 class CustomUserViewSet(UserViewSet):
