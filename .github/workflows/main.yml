@@ -49,4 +49,4 @@ jobs:
           file: frontend/Dockerfile
           context: frontend/
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/$food_frontend:latest
+          tags: ${{ secrets.DOCKER_USERNAME }}/food_frontend:latest
