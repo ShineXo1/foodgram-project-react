@@ -4,22 +4,20 @@ from django.db.models import Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from djoser.views import UserViewSet
 from django.utils.translation import gettext as _
+from djoser.views import UserViewSet
 from rest_framework import status, permissions
 from rest_framework.decorators import action
 from rest_framework.permissions import (SAFE_METHODS, IsAuthenticated,
                                         IsAuthenticatedOrReadOnly)
-
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
-
-from .paginator import FoodgramPafination
-from .permissions import IsAuthorOrReadOnly
 from recipes.models import FavoriteRecipe, Ingredient, \
     Recipe, ShoppingCart, Tag, IngredientAmount
 from users.models import User, Subscribe
 from .filters import RecipeFilter, IngredientFilter
+from .paginator import FoodgramPafination
+from .permissions import IsAuthorOrReadOnly
 from .serializers import (IngredientSerializer, RecipeEditSerializer,
                           RecipesSerializer, TagSerializer,
                           UserSubscribeSerializer, SubscribeRecipeSerializer)
@@ -113,7 +111,7 @@ class CustomUserViewSet(UserViewSet):
         queryset = Subscribe.objects.filter(user=request.user)
         page = self.paginate_queryset(queryset)
         serializer = UserSubscribeSerializer(page, many=True,
-                                           context={'request': request})
+                                             context={'request': request})
         return self.get_paginated_response(serializer.data)
 
     @action(detail=True,
@@ -133,7 +131,7 @@ class CustomUserViewSet(UserViewSet):
         Subscribe.objects.create(user=user, author=author)
         queryset = Subscribe.objects.get(user=request.user, author=author)
         serializer = UserSubscribeSerializer(queryset,
-                                           context={'request': request})
+                                             context={'request': request})
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     @subscribe.mapping.delete
