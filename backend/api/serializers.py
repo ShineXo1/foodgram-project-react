@@ -4,10 +4,10 @@ from django.contrib.auth.hashers import check_password
 from django.core.files.base import ContentFile
 from django.db import transaction
 from djoser.serializers import (PasswordSerializer,
-    UserCreateSerializer, UserSerializer)
+                                UserCreateSerializer, UserSerializer)
 from rest_framework import serializers
 from recipes.models import (Ingredient, IngredientAmount,
-    Recipe, Tag, FavoriteRecipe)
+                            Recipe, Tag, FavoriteRecipe)
 from users.models import User, Subscribe
 
 
