@@ -36,4 +36,3 @@ class Command(BaseCommand):
             raise CommandError(
                 _(f'The file is missing in the data folder{DATA_ROOT}')
             )
-    
