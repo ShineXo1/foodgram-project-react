@@ -16,8 +16,8 @@ from rest_framework.viewsets import ModelViewSet
 
 from .paginator import FoodgramPafination
 from .permissions import IsAuthorOrReadOnly
-from recipes.models import FavoriteRecipe, Ingredient, \
-    Recipe, ShoppingCart, Tag, IngredientAmount
+from recipes.models import (FavoriteRecipe, Ingredient,
+                            Recipe, ShoppingCart, Tag, IngredientAmount)
 from users.models import User, Subscribe
 from .filters import RecipeFilter, IngredientFilter
 from .serializers import (IngredientSerializer, RecipeEditSerializer,
@@ -113,7 +113,7 @@ class CustomUserViewSet(UserViewSet):
         queryset = Subscribe.objects.filter(user=request.user)
         page = self.paginate_queryset(queryset)
         serializer = UserSubscribeSerializer(page, many=True,
-                                           context={'request': request})
+                                             context={'request': request})
         return self.get_paginated_response(serializer.data)
 
     @action(detail=True,

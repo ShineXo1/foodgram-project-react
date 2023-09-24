@@ -7,10 +7,10 @@ from rest_framework.status import (HTTP_201_CREATED, HTTP_204_NO_CONTENT,
 def add_remove(self, request, target, obj, target_obj):
     """ Функция для подписок, пополнения корзины или лайков пользователем """
 
-    SUCESS_DELETE = {
+    success_delete = {
         'detail': f"Success delete from your {obj.__name__}'s list"}
-    ALREADY_IN_LIST = {'errors': f"Already in your {obj.__name__}'s list"}
-    NOT_IN_LIST = {'errors': f"Not in your {obj.__name__}'s list"}
+    already_in_list = {'errors': f"Already in your {obj.__name__}'s list"}
+    not_in_list = {'errors': f"Not in your {obj.__name__}'s list"}
 
     user = self.request.user
     get_obj = get_object_or_404(target_obj, pk=self.kwargs.get(target))
@@ -21,7 +21,7 @@ def add_remove(self, request, target, obj, target_obj):
     filtered = obj.objects.filter(**target_kwargs)
 
     if request.method == 'POST' and filtered.exists():
-        return Response(ALREADY_IN_LIST, status=HTTP_400_BAD_REQUEST)
+        return Response(already_in_list, status=HTTP_400_BAD_REQUEST)
     if request.method == 'POST':
         obj.objects.create(**target_kwargs)
         serializer = self.serializer_class(get_obj)
@@ -29,8 +29,8 @@ def add_remove(self, request, target, obj, target_obj):
 
     if request.method == 'DELETE' and filtered.exists():
         filtered.delete()
-        return Response(SUCESS_DELETE, status=HTTP_204_NO_CONTENT)
+        return Response(success_delete, status=HTTP_204_NO_CONTENT)
     if request.method == 'DELETE':
-        return Response(NOT_IN_LIST, status=HTTP_400_BAD_REQUEST)
+        return Response(not_in_list, status=HTTP_400_BAD_REQUEST)
 
     return True

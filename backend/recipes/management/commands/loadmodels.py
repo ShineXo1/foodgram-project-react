@@ -33,5 +33,8 @@ class Command(BaseCommand):
                               f'already added to the database')
 
         except FileNotFoundError:
-            raise CommandError(_(f'The file is missing in the data folder{DATA_ROOT}'))
+            raise CommandError(
+                _(f'The file is missing in the data folder{DATA_ROOT}')
+            )
+
             

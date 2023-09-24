@@ -1,14 +1,14 @@
 import base64
 
 from django.db import transaction
-from djoser.serializers import PasswordSerializer, \
-    UserCreateSerializer, UserSerializer
+from djoser.serializers import (PasswordSerializer,
+                                UserCreateSerializer, UserSerializer)
 from django.core.files.base import ContentFile
 from django.contrib.auth.hashers import check_password
 from rest_framework import serializers
 
-from recipes.models import Ingredient, IngredientAmount, \
-    Recipe, Tag, FavoriteRecipe
+from recipes.models import (Ingredient, IngredientAmount,
+                            Recipe, Tag, FavoriteRecipe)
 from users.models import User, Subscribe
 
 
@@ -223,6 +223,7 @@ class UserSubscribeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Subscribe
         fields = '__all__'
+
 
 def representation(context, instance, serializer):
     """Функция для использования в to_representation"""
