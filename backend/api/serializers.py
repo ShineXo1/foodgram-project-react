@@ -1,7 +1,7 @@
 import base64
 
-from django.core.files.base import ContentFile
 from django.contrib.auth.hashers import check_password
+from django.core.files.base import ContentFile
 from django.db import transaction
 from djoser.serializers import PasswordSerializer, \
     UserCreateSerializer, UserSerializer

@@ -116,7 +116,7 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 6,
 }
 
-SIMPLE_JWT = {'AUTH_HEADER_TYPES': ('Bearer',),}
+SIMPLE_JWT = {'AUTH_HEADER_TYPES': ('Bearer',), }
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/

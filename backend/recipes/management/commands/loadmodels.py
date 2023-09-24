@@ -5,7 +5,6 @@ from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 from django.db.utils import IntegrityError
 from django.utils.translation import gettext as _
-
 from recipes.models import Ingredient
 
 DATA_ROOT = os.path.join(settings.BASE_DIR, 'data')
@@ -33,5 +32,6 @@ class Command(BaseCommand):
                               f'already added to the database')
 
         except FileNotFoundError:
-            raise CommandError(_(f'The file is missing in the data folder{DATA_ROOT}'))
-            
+            raise CommandError(
+                _(f'The file is missing in the data folder{DATA_ROOT}')
+            )
