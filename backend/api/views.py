@@ -133,7 +133,7 @@ class CustomUserViewSet(UserViewSet):
         Subscribe.objects.create(user=user, author=author)
         queryset = Subscribe.objects.get(user=request.user, author=author)
         serializer = UserSubscribeSerializer(queryset,
-                                           context={'request': request})
+                                             context={'request': request})
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     @subscribe.mapping.delete
