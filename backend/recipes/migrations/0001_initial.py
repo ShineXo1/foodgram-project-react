@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=200, verbose_name='Название продукта')),
-                ('measurement', models.CharField(max_length=50, verbose_name='Еденица измерения')),
+                ('measurement_point', models.CharField(max_length=50, verbose_name='Еденица измерения')),
             ],
             options={
                 'verbose_name': 'Продукт',
@@ -81,7 +81,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AddConstraint(
             model_name='ingredient',
-            constraint=models.UniqueConstraint(fields=('name', 'measurement'), name='unique_name_measurement'),
+            constraint=models.UniqueConstraint(fields=('name', 'measurement_point'), name='unique_name_measurement'),
         ),
         migrations.AddConstraint(
             model_name='ingredientamount',
