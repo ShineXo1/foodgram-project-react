@@ -5,7 +5,7 @@ from .models import (Ingredient, Tag, Recipe,
 
 
 class IngredientAdmin(admin.ModelAdmin):
-    list_display = ['name', 'measurement_point',]
+    list_display = ['name', 'measurement_point', ]
     list_filter = ('name',)
     ordering = ('id',)
 
